@@ -1,0 +1,19 @@
+2026-11-14 23:19:28 [main] INFO  directory.Main - Запуск консольного приложения 'WorkingDirectory'
+2026-11-14 23:19:28 [main] INFO  directory.WorkingDirectory - Инициализирован рабочий каталог Singleton: D:\лабы\java\lab2\my_folder
+2026-11-14 23:19:39 [main] INFO  directory.WorkingDirectory - Штатная ситуация: Выведено содержимое каталога: D:\лабы\java\lab2\my_folder
+2026-11-14 23:19:39 [main] INFO  directory.Main - Штатная ситуация: Выведено содержимое каталога: D:\лабы\java\lab2\my_folder
+2026-11-14 23:19:44 [main] INFO  directory.WorkingDirectory - Штатная ситуация: Успешный переход в подкаталог: projects
+2026-11-14 23:19:44 [main] INFO  directory.Main - Штатная ситуация: Успешный переход в подкаталог: projects
+2026-11-14 23:19:48 [main] INFO  directory.WorkingDirectory - Штатная ситуация: Успешный переход в подкаталог: java
+2026-11-14 23:19:48 [main] INFO  directory.Main - Штатная ситуация: Успешный переход в подкаталог: java
+2026-11-14 23:19:52 [main] INFO  directory.Main - Штатная ситуация: выведена справка по командам
+2026-11-14 23:20:25 [main] INFO  directory.WorkingDirectory - Штатная ситуация: Успешно удалены все вложенные подкаталоги в: D:\лабы\java\lab2\my_folder\projects\java
+2026-11-14 23:20:25 [main] INFO  directory.Main - Штатная ситуация: Успешно удалены все вложенные подкаталоги в: D:\лабы\java\lab2\my_folder\projects\java
+2026-11-14 23:20:27 [main] INFO  directory.WorkingDirectory - Штатная ситуация: Выведено содержимое каталога: D:\лабы\java\lab2\my_folder\projects\java
+2026-11-14 23:20:27 [main] INFO  directory.Main - Штатная ситуация: Выведено содержимое каталога: D:\лабы\java\lab2\my_folder\projects\java
+2026-11-14 23:20:30 [main] INFO  directory.Main - Штатная ситуация: завершение работы программы пользователем
+2026-11-14 23:20:30 [main] INFO  directory.Main - Программа завершила свою работу
+2026-11-14 23:21:06 [main] INFO  directory.Main - Запуск консольного приложения 'WorkingDirectory'
+2026-11-14 23:21:06 [main] INFO  directory.WorkingDirectory - Инициализирован рабочий каталог Singleton: D:\лабы\java\lab2\my_folder
+2026-11-14 23:21:17 [main] INFO  directory.Main - Штатная ситуация: завершение работы программы пользователем
+2026-11-14 23:21:17 [main] INFO  directory.Main - Программа завершила свою работу
