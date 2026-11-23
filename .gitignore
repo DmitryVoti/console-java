@@ -47,3 +47,8 @@ build/
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+target/
+logs/
+my_folder/
+.idea/
+*.iml
