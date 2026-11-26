@@ -1,29 +1,16 @@
 package directory;
 
-public class OperationStatus {
+import lombok.NonNull;
+
+public record OperationStatus(@NonNull Status status, @NonNull String message) {
+
     public enum Status {
         OK,
         ERROR
     }
 
-    private final Status status;
-    private final String message;
-
-    public OperationStatus(Status status, String message) {
-        this.status = status;
-        this.message = message;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
     @Override
     public String toString() {
-        return "[" + status + "] " + message;
+        return "[%s] %s".formatted(status, message);
     }
 }
