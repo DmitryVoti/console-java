@@ -1,5 +1,7 @@
-package directory;
+package cli;
 
+import directory.OperationStatus;
+import directory.WorkingDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,10 +9,10 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Main {
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+public class ConsoleApplication {
+    private static final Logger logger = LoggerFactory.getLogger(ConsoleApplication.class);
 
-    public static void main(String[] args) {
+    public static void run() {
         logger.info("Запуск консольного приложения 'WorkingDirectory'");
 
         Scanner scan = new Scanner(System.in);
