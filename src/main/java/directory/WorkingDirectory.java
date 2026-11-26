@@ -1,7 +1,6 @@
 package directory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -15,9 +14,8 @@ import java.util.stream.Stream;
  * Обеспечивает навигацию по файловой системе, просмотр содержимого, создание и удаление директорий,
  * а также поиск файлов и построение дерева каталогов.
  */
+@Slf4j
 public class WorkingDirectory {
-    private static final Logger logger = LoggerFactory.getLogger(WorkingDirectory.class);
-
     private static WorkingDirectory instance;
     private String directoryName;
 
@@ -30,7 +28,7 @@ public class WorkingDirectory {
      */
     private WorkingDirectory(String directoryName) throws IOException {
         this.directoryName = new File(directoryName).getCanonicalPath();
-        logger.info("Инициализирован рабочий каталог Singleton: {}", this.directoryName);
+        log.info("Инициализирован рабочий каталог Singleton: {}", this.directoryName);
     }
 
     /**
@@ -45,19 +43,19 @@ public class WorkingDirectory {
         File dir = new File(directoryName);
         if (!dir.exists()) {
             String errorMsg = "Каталога не существует: " + directoryName;
-            logger.error("Внештатная ситуация при getInstance: {}", errorMsg);
+            log.error("Внештатная ситуация при getInstance: {}", errorMsg);
             throw new IOException(errorMsg);
         }
         if (!dir.isDirectory()) {
             String errorMsg = "Путь не является каталогом: " + directoryName;
-            logger.error("Внештатная ситуация при getInstance: {}", errorMsg);
+            log.error("Внештатная ситуация при getInstance: {}", errorMsg);
             throw new IOException(errorMsg);
         }
         if (instance == null) {
             instance = new WorkingDirectory(directoryName);
         } else {
             instance.directoryName = dir.getCanonicalPath();
-            logger.info("Экземпляр Singleton обновлен на каталог: {}", instance.directoryName);
+            log.info("Экземпляр Singleton обновлен на каталог: {}", instance.directoryName);
         }
         return instance;
     }
@@ -92,11 +90,11 @@ public class WorkingDirectory {
             File dir = new File(directoryName);
             printRecursive(dir, "", directoriesOnly, firstLevelOnly);
             String msg = "Выведено содержимое каталога: " + directoryName;
-            logger.info("Штатная ситуация: {}", msg);
+            log.info("Штатная ситуация: {}", msg);
             return new OperationResult(OperationResult.Status.OK, msg);
         } catch (Exception e) {
             String errorMsg = "Ошибка при выводе содержимого: " + e.getMessage();
-            logger.error("Внештатная ситуация: {}", errorMsg, e);
+            log.error("Внештатная ситуация: {}", errorMsg, e);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
@@ -150,7 +148,7 @@ public class WorkingDirectory {
             File dir = new File(directoryName);
             if (!dir.exists()) {
                 String errorMsg = "Невозможно отрисовать дерево, путь " + directoryName + " не существует";
-                logger.error("Внештатная ситуация: {}", errorMsg);
+                log.error("Внештатная ситуация: {}", errorMsg);
                 return new OperationResult(OperationResult.Status.ERROR, errorMsg);
             }
 
@@ -169,7 +167,7 @@ public class WorkingDirectory {
                     drawFileTreeRecursive(dir, "", fileOut);
                 } catch (IOException e) {
                     String errorMsg = "Не удалось записать дерево в файл: " + e.getMessage();
-                    logger.error("Внештатная ситуация: {}", errorMsg, e);
+                    log.error("Внештатная ситуация: {}", errorMsg, e);
                     return new OperationResult(OperationResult.Status.ERROR, errorMsg);
                 }
             } else {
@@ -178,11 +176,11 @@ public class WorkingDirectory {
             }
 
             String msg = "Дерево каталогов успешно отрисовано для: " + directoryName;
-            logger.info("Штатная ситуация: {}", msg);
+            log.info("Штатная ситуация: {}", msg);
             return new OperationResult(OperationResult.Status.OK, msg);
         } catch (Exception e) {
             String errorMsg = "Не удалось отрисовать дерево: " + e.getMessage();
-            logger.error("Внештатная ситуация: {}", errorMsg, e);
+            log.error("Внештатная ситуация: {}", errorMsg, e);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
@@ -223,11 +221,11 @@ public class WorkingDirectory {
         if (parent != null) {
             System.out.println(parent.getAbsolutePath());
             String msg = "Родительский каталог: " + parent.getAbsolutePath();
-            logger.info("Штатная ситуация: {}", msg);
+            log.info("Штатная ситуация: {}", msg);
             return new OperationResult(OperationResult.Status.OK, msg);
         } else {
             String errorMsg = "Родительский каталог отсутствует (текущий каталог — корень)";
-            logger.warn("Внештатная ситуация: {}", errorMsg);
+            log.warn("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
@@ -243,11 +241,11 @@ public class WorkingDirectory {
         if (parent != null) {
             this.directoryName = parent.getAbsolutePath();
             String msg = "Выполнен переход в родительский каталог: " + directoryName;
-            logger.info("Штатная ситуация: {}", msg);
+            log.info("Штатная ситуация: {}", msg);
             return new OperationResult(OperationResult.Status.OK, msg);
         } else {
             String errorMsg = "Невозможно перейти к родителю — родительский каталог отсутствует";
-            logger.warn("Внештатная ситуация: {}", errorMsg);
+            log.warn("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
@@ -261,7 +259,7 @@ public class WorkingDirectory {
     public OperationResult isItChildDirectory(String targetName) {
         if (targetName == null || targetName.isBlank()) {
             String errorMsg = "Имя искомой директории не может быть пустым";
-            logger.warn("Внештатная ситуация: {}", errorMsg);
+            log.warn("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
         File dir = new File(directoryName);
@@ -271,14 +269,14 @@ public class WorkingDirectory {
                 if (file.getName().equals(targetName) && file.isDirectory()) {
                     System.out.println("true");
                     String msg = "Подкаталог '" + targetName + "' существует в текущем каталоге";
-                    logger.info("Штатная ситуация: {}", msg);
+                    log.info("Штатная ситуация: {}", msg);
                     return new OperationResult(OperationResult.Status.OK, msg);
                 }
             }
         }
         System.out.println("false");
         String errorMsg = "Дочерняя папка '" + targetName + "' не найдена";
-        logger.warn("Внештатная ситуация: {}", errorMsg);
+        log.warn("Внештатная ситуация: {}", errorMsg);
         return new OperationResult(OperationResult.Status.ERROR, errorMsg);
     }
 
@@ -292,7 +290,7 @@ public class WorkingDirectory {
         File dir = new File(directoryName);
         if (!dir.exists()) {
             String errorMsg = "Родительский каталог не существует: " + directoryName;
-            logger.error("Внештатная ситуация: {}", errorMsg);
+            log.error("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
         if ("..".equals(name)) {
@@ -302,18 +300,18 @@ public class WorkingDirectory {
         File subFolder = new File(dir, name);
         if (!subFolder.exists() || !subFolder.isDirectory()) {
             String errorMsg = "Невозможно перейти в подкаталог, каталога не существует: '" + name + "'";
-            logger.warn("Внештатная ситуация: {}", errorMsg);
+            log.warn("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
 
         try {
             this.directoryName = subFolder.getCanonicalPath();
             String msg = "Успешный переход в подкаталог: " + name;
-            logger.info("Штатная ситуация: {}", msg);
+            log.info("Штатная ситуация: {}", msg);
             return new OperationResult(OperationResult.Status.OK, msg);
         } catch (IOException e) {
             String errorMsg = "Ошибка при вычислении canonical path для " + name;
-            logger.error("Внештатная ситуация: {}", errorMsg, e);
+            log.error("Внештатная ситуация: {}", errorMsg, e);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
@@ -330,23 +328,23 @@ public class WorkingDirectory {
 
         if (!dir.exists()) {
             String errorMsg = "Невозможно создать подкаталог, родительский каталог не существует: " + directoryName;
-            logger.error("Внештатная ситуация: {}", errorMsg);
+            log.error("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
         if (subFolder.exists()) {
             String errorMsg = "Подкаталог '" + name + "' уже существует";
-            logger.warn("Внештатная ситуация: {}", errorMsg);
+            log.warn("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
         if (!subFolder.mkdir()) {
             String errorMsg = "Не удалось создать подкаталог: " + name;
-            logger.error("Внештатная ситуация: {}", errorMsg);
+            log.error("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
 
         String successMsg = "Подкаталог успешно создан: " + subFolder.getAbsolutePath();
         System.out.println("Подкаталог успешно создан: " + subFolder.getName());
-        logger.info("Штатная ситуация: {}", successMsg);
+        log.info("Штатная ситуация: {}", successMsg);
         return new OperationResult(OperationResult.Status.OK, successMsg);
     }
 
@@ -381,11 +379,11 @@ public class WorkingDirectory {
                     .forEach(System.out::println);
             }
             String msg = "Поиск '" + filename + "' успешно выполнен";
-            logger.info("Штатная ситуация: {}", msg);
+            log.info("Штатная ситуация: {}", msg);
             return new OperationResult(OperationResult.Status.OK, msg);
         } catch (IOException e) {
             String errorMsg = "Ошибка при поиске файла '" + filename + "': " + e.getMessage();
-            logger.error("Внештатная ситуация: {}", errorMsg, e);
+            log.error("Внештатная ситуация: {}", errorMsg, e);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
@@ -403,22 +401,22 @@ public class WorkingDirectory {
             File file = new File(directoryName, filename);
             if (!file.exists()) {
                 String errorMsg = "Не удалось удалить, " + filename + " не существует.";
-                logger.warn("Внештатная ситуация: {}", errorMsg);
+                log.warn("Внештатная ситуация: {}", errorMsg);
                 return new OperationResult(OperationResult.Status.ERROR, errorMsg);
             }
             boolean success = deleteSb(file, includeSubdirectories);
             success = file.delete() && success;
             if (!success) {
                 String errorMsg = "Не удалось полностью удалить: " + filename;
-                logger.warn("Внештатная ситуация: {}", errorMsg);
+                log.warn("Внештатная ситуация: {}", errorMsg);
                 return new OperationResult(OperationResult.Status.ERROR, errorMsg);
             }
             String msg = "Успешно удалено: " + filename;
-            logger.info("Штатная ситуация: {}", msg);
+            log.info("Штатная ситуация: {}", msg);
             return new OperationResult(OperationResult.Status.OK, msg);
         } catch (Exception e) {
             String errorMsg = "Ошибка при выполнении операции truncate: " + e.getMessage();
-            logger.error("Внештатная ситуация: {}", errorMsg, e);
+            log.error("Внештатная ситуация: {}", errorMsg, e);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
