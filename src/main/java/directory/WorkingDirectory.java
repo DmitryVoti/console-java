@@ -83,21 +83,21 @@ public class WorkingDirectory {
     /**
      * Выводит содержимое текущего рабочего каталога с учетом флагов фильтрации и глубины.
      *
-     * @param onlyDirectoryFlag        если true, выводить только директории
-     * @param onlyFirstLevelSearchFlag если true, выполнять поиск только на первом уровне вложений
-     * @return объект {@link OperationStatus} со статусом выполнения операции
+     * @param directoriesOnly        если true, выводить только директории
+     * @param firstLevelOnly если true, выполнять поиск только на первом уровне вложений
+     * @return объект {@link OperationResult} со статусом выполнения операции
      */
-    public OperationStatus print(boolean onlyDirectoryFlag, boolean onlyFirstLevelSearchFlag) {
+    public OperationResult print(boolean directoriesOnly, boolean firstLevelOnly) {
         try {
             File dir = new File(directoryName);
-            printRecursive(dir, "", onlyDirectoryFlag, onlyFirstLevelSearchFlag);
+            printRecursive(dir, "", directoriesOnly, firstLevelOnly);
             String msg = "Выведено содержимое каталога: " + directoryName;
             logger.info("Штатная ситуация: {}", msg);
-            return new OperationStatus(OperationStatus.Status.OK, msg);
+            return new OperationResult(OperationResult.Status.OK, msg);
         } catch (Exception e) {
             String errorMsg = "Ошибка при выводе содержимого: " + e.getMessage();
             logger.error("Внештатная ситуация: {}", errorMsg, e);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
 
@@ -106,28 +106,32 @@ public class WorkingDirectory {
      *
      * @param dir                      текущий файл или директория
      * @param prefix                   текстовый префикс для визуального оформления дерева
-     * @param onlyDirectoryFlag        флаг вывода только директорий
-     * @param onlyFirstLevelSearchFlag флаг ограничения глубины первым уровнем
+     * @param directoriesOnly        флаг вывода только директорий
+     * @param firstLevelOnly флаг ограничения глубины первым уровнем
      * @throws IOException если путь не существует
      */
-    private void printRecursive(File dir, String prefix, boolean onlyDirectoryFlag, boolean onlyFirstLevelSearchFlag) throws IOException {
+    private void printRecursive(
+        File dir,
+        String prefix,
+        boolean directoriesOnly,
+        boolean firstLevelOnly) throws IOException {
         if (!dir.exists()) {
             throw new IOException("Путь не существует: " + dir.getAbsolutePath());
         }
         File[] filesInDir = dir.listFiles();
-        if (!(onlyDirectoryFlag && dir.isFile())) {
+        if (!(directoriesOnly && dir.isFile())) {
             System.out.println(prefix + dir.getName());
         }
         if (filesInDir != null) {
-            for (File curFile : filesInDir) {
-                if (onlyFirstLevelSearchFlag) {
-                    if (onlyDirectoryFlag) {
-                        if (curFile.isDirectory()) System.out.println(prefix + "│  " + curFile.getName());
+            for (File currentFile : filesInDir) {
+                if (firstLevelOnly) {
+                    if (directoriesOnly) {
+                        if (currentFile.isDirectory()) System.out.println(prefix + "│  " + currentFile.getName());
                     } else {
-                        System.out.println(prefix + "│  " + curFile.getName());
+                        System.out.println(prefix + "│  " + currentFile.getName());
                     }
                 } else {
-                    printRecursive(curFile, prefix + "│  ", onlyDirectoryFlag, onlyFirstLevelSearchFlag);
+                    printRecursive(currentFile, prefix + "│  ", directoriesOnly, false);
                 }
             }
         }
@@ -139,15 +143,15 @@ public class WorkingDirectory {
      * иначе выводит результат в консоль.
      *
      * @param path директория для сохранения файла структуры (может быть null)
-     * @return объект {@link OperationStatus} со статусом выполнения операции
+     * @return объект {@link OperationResult} со статусом выполнения операции
      */
-    public OperationStatus drawFileTree(String path) {
+    public OperationResult drawFileTree(String path) {
         try {
             File dir = new File(directoryName);
             if (!dir.exists()) {
                 String errorMsg = "Невозможно отрисовать дерево, путь " + directoryName + " не существует";
                 logger.error("Внештатная ситуация: {}", errorMsg);
-                return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+                return new OperationResult(OperationResult.Status.ERROR, errorMsg);
             }
 
             if (path != null && !path.isBlank()) {
@@ -157,13 +161,16 @@ public class WorkingDirectory {
                     parentDir.mkdirs();
                 }
 
-                try (PrintStream fileOut = new PrintStream(new FileOutputStream(outputFile), true, StandardCharsets.UTF_8)) {
+                try (PrintStream fileOut = new PrintStream(
+                    new FileOutputStream(outputFile),
+                    true,
+                    StandardCharsets.UTF_8)) {
                     fileOut.println(dir.getName());
                     drawFileTreeRecursive(dir, "", fileOut);
                 } catch (IOException e) {
                     String errorMsg = "Не удалось записать дерево в файл: " + e.getMessage();
                     logger.error("Внештатная ситуация: {}", errorMsg, e);
-                    return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+                    return new OperationResult(OperationResult.Status.ERROR, errorMsg);
                 }
             } else {
                 System.out.println(dir.getName());
@@ -172,11 +179,11 @@ public class WorkingDirectory {
 
             String msg = "Дерево каталогов успешно отрисовано для: " + directoryName;
             logger.info("Штатная ситуация: {}", msg);
-            return new OperationStatus(OperationStatus.Status.OK, msg);
+            return new OperationResult(OperationResult.Status.OK, msg);
         } catch (Exception e) {
             String errorMsg = "Не удалось отрисовать дерево: " + e.getMessage();
             logger.error("Внештатная ситуация: {}", errorMsg, e);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
 
@@ -208,40 +215,40 @@ public class WorkingDirectory {
     /**
      * Выводит в консоль абсолютный путь родительского каталога текущей рабочей директории.
      *
-     * @return объект {@link OperationStatus} со статусом выполнения
+     * @return объект {@link OperationResult} со статусом выполнения
      */
-    public OperationStatus printParentPath() {
+    public OperationResult printParentPath() {
         File dir = new File(directoryName);
         File parent = dir.getParentFile();
         if (parent != null) {
             System.out.println(parent.getAbsolutePath());
             String msg = "Родительский каталог: " + parent.getAbsolutePath();
             logger.info("Штатная ситуация: {}", msg);
-            return new OperationStatus(OperationStatus.Status.OK, msg);
+            return new OperationResult(OperationResult.Status.OK, msg);
         } else {
             String errorMsg = "Родительский каталог отсутствует (текущий каталог — корень)";
             logger.warn("Внештатная ситуация: {}", errorMsg);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
 
     /**
      * Выполняет переход к родительскому каталогу, изменяя значение рабочего каталога.
      *
-     * @return объект {@link OperationStatus} со статусом выполнения
+     * @return объект {@link OperationResult} со статусом выполнения
      */
-    public OperationStatus toParentDirectory() {
+    public OperationResult toParentDirectory() {
         File dir = new File(directoryName);
         File parent = dir.getParentFile();
         if (parent != null) {
             this.directoryName = parent.getAbsolutePath();
             String msg = "Выполнен переход в родительский каталог: " + directoryName;
             logger.info("Штатная ситуация: {}", msg);
-            return new OperationStatus(OperationStatus.Status.OK, msg);
+            return new OperationResult(OperationResult.Status.OK, msg);
         } else {
             String errorMsg = "Невозможно перейти к родителю — родительский каталог отсутствует";
             logger.warn("Внештатная ситуация: {}", errorMsg);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
 
@@ -249,13 +256,13 @@ public class WorkingDirectory {
      * Проверяет, существует ли дочерний каталог с заданным именем в текущем рабочем каталоге.
      *
      * @param targetName имя проверяемого каталога
-     * @return объект {@link OperationStatus} со статусом выполнения
+     * @return объект {@link OperationResult} со статусом выполнения
      */
-    public OperationStatus isItChildDirectory(String targetName) {
+    public OperationResult isItChildDirectory(String targetName) {
         if (targetName == null || targetName.isBlank()) {
             String errorMsg = "Имя искомой директории не может быть пустым";
             logger.warn("Внештатная ситуация: {}", errorMsg);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
         File dir = new File(directoryName);
         File[] files = dir.listFiles();
@@ -265,28 +272,28 @@ public class WorkingDirectory {
                     System.out.println("true");
                     String msg = "Подкаталог '" + targetName + "' существует в текущем каталоге";
                     logger.info("Штатная ситуация: {}", msg);
-                    return new OperationStatus(OperationStatus.Status.OK, msg);
+                    return new OperationResult(OperationResult.Status.OK, msg);
                 }
             }
         }
         System.out.println("false");
         String errorMsg = "Дочерняя папка '" + targetName + "' не найдена";
         logger.warn("Внештатная ситуация: {}", errorMsg);
-        return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+        return new OperationResult(OperationResult.Status.ERROR, errorMsg);
     }
 
     /**
      * Выполняет переход в подкаталог по его имени или возврат к родителю при передаче "..".
      *
      * @param name имя подкаталога или ".."
-     * @return объект {@link OperationStatus} со статусом выполнения
+     * @return объект {@link OperationResult} со статусом выполнения
      */
-    public OperationStatus toSubdirectory(String name) {
+    public OperationResult toSubdirectory(String name) {
         File dir = new File(directoryName);
         if (!dir.exists()) {
             String errorMsg = "Родительский каталог не существует: " + directoryName;
             logger.error("Внештатная ситуация: {}", errorMsg);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
         if ("..".equals(name)) {
             return toParentDirectory();
@@ -296,18 +303,18 @@ public class WorkingDirectory {
         if (!subFolder.exists() || !subFolder.isDirectory()) {
             String errorMsg = "Невозможно перейти в подкаталог, каталога не существует: '" + name + "'";
             logger.warn("Внештатная ситуация: {}", errorMsg);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
 
         try {
             this.directoryName = subFolder.getCanonicalPath();
             String msg = "Успешный переход в подкаталог: " + name;
             logger.info("Штатная ситуация: {}", msg);
-            return new OperationStatus(OperationStatus.Status.OK, msg);
+            return new OperationResult(OperationResult.Status.OK, msg);
         } catch (IOException e) {
             String errorMsg = "Ошибка при вычислении canonical path для " + name;
             logger.error("Внештатная ситуация: {}", errorMsg, e);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
 
@@ -315,71 +322,71 @@ public class WorkingDirectory {
      * Создает новый каталог с указанным именем внутри текущего рабочего каталога.
      *
      * @param name имя создаваемой папки
-     * @return объект {@link OperationStatus} со статусом выполнения
+     * @return объект {@link OperationResult} со статусом выполнения
      */
-    public OperationStatus createNewDirectory(String name) {
+    public OperationResult createNewDirectory(String name) {
         File dir = new File(directoryName);
         File subFolder = new File(dir, name);
 
         if (!dir.exists()) {
             String errorMsg = "Невозможно создать подкаталог, родительский каталог не существует: " + directoryName;
             logger.error("Внештатная ситуация: {}", errorMsg);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
         if (subFolder.exists()) {
             String errorMsg = "Подкаталог '" + name + "' уже существует";
             logger.warn("Внештатная ситуация: {}", errorMsg);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
         if (!subFolder.mkdir()) {
             String errorMsg = "Не удалось создать подкаталог: " + name;
             logger.error("Внештатная ситуация: {}", errorMsg);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
 
         String successMsg = "Подкаталог успешно создан: " + subFolder.getAbsolutePath();
         System.out.println("Подкаталог успешно создан: " + subFolder.getName());
         logger.info("Штатная ситуация: {}", successMsg);
-        return new OperationStatus(OperationStatus.Status.OK, successMsg);
+        return new OperationResult(OperationResult.Status.OK, successMsg);
     }
 
     /**
      * Выполняет поиск файлов или папок по маске/имени в текущем каталоге и всех подкаталогах.
      *
-     * @param filename       имя файла или расширение для поиска
+     * @param filename        имя файла или расширение для поиска
      * @param onlyDirectories если true, искать только директории
-     * @return объект {@link OperationStatus} со статусом выполнения
+     * @return объект {@link OperationResult} со статусом выполнения
      */
-    public OperationStatus findFile(String filename, boolean onlyDirectories) {
+    public OperationResult findFile(String filename, boolean onlyDirectories) {
         try (Stream<Path> stream = Files.walk(Paths.get(directoryName))) {
             if (!onlyDirectories) {
                 stream.filter(Files::isRegularFile)
-                        .map(Path::toAbsolutePath)
-                        .filter(p -> {
-                            String name = p.getFileName().toString().toLowerCase();
-                            String search = filename.toLowerCase();
-                            return search.startsWith(".") ? name.endsWith(search) : name.contains(search);
-                        })
-                        .map(Path::toString)
-                        .forEach(System.out::println);
+                    .map(Path::toAbsolutePath)
+                    .filter(p -> {
+                        String name = p.getFileName().toString().toLowerCase();
+                        String search = filename.toLowerCase();
+                        return search.startsWith(".") ? name.endsWith(search) : name.contains(search);
+                    })
+                    .map(Path::toString)
+                    .forEach(System.out::println);
             } else {
                 stream.filter(Files::isDirectory)
-                        .map(Path::toAbsolutePath)
-                        .filter(p -> {
-                            String name = p.getFileName().toString().toLowerCase();
-                            String search = filename.toLowerCase();
-                            return name.contains(search);
-                        })
-                        .map(Path::toString)
-                        .forEach(System.out::println);
+                    .map(Path::toAbsolutePath)
+                    .filter(p -> {
+                        String name = p.getFileName().toString().toLowerCase();
+                        String search = filename.toLowerCase();
+                        return name.contains(search);
+                    })
+                    .map(Path::toString)
+                    .forEach(System.out::println);
             }
             String msg = "Поиск '" + filename + "' успешно выполнен";
             logger.info("Штатная ситуация: {}", msg);
-            return new OperationStatus(OperationStatus.Status.OK, msg);
+            return new OperationResult(OperationResult.Status.OK, msg);
         } catch (IOException e) {
             String errorMsg = "Ошибка при поиске файла '" + filename + "': " + e.getMessage();
             logger.error("Внештатная ситуация: {}", errorMsg, e);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
 
@@ -387,33 +394,32 @@ public class WorkingDirectory {
      * Удаляет файл или подкаталог в рабочем каталоге.
      * При необходимости поддерживает рекурсивное удаление содержимого подкаталогов.
      *
-     * @param filename               имя удаляемого файла или каталога
-     * @param includeSubdirectories  если true, удалять каталог вместе со всем содержимым
-     * @return объект {@link OperationStatus} со статусом выполнения
+     * @param filename              имя удаляемого файла или каталога
+     * @param includeSubdirectories если true, удалять каталог вместе со всем содержимым
+     * @return объект {@link OperationResult} со статусом выполнения
      */
-    public OperationStatus truncate(String filename, boolean includeSubdirectories) {
+    public OperationResult truncate(String filename, boolean includeSubdirectories) {
         try {
             File file = new File(directoryName, filename);
             if (!file.exists()) {
                 String errorMsg = "Не удалось удалить, " + filename + " не существует.";
                 logger.warn("Внештатная ситуация: {}", errorMsg);
-                return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+                return new OperationResult(OperationResult.Status.ERROR, errorMsg);
             }
             boolean success = deleteSb(file, includeSubdirectories);
             success = file.delete() && success;
             if (!success) {
                 String errorMsg = "Не удалось полностью удалить: " + filename;
                 logger.warn("Внештатная ситуация: {}", errorMsg);
-                return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+                return new OperationResult(OperationResult.Status.ERROR, errorMsg);
             }
             String msg = "Успешно удалено: " + filename;
             logger.info("Штатная ситуация: {}", msg);
-            return new OperationStatus(OperationStatus.Status.OK, msg);
-        }
-        catch (Exception e) {
+            return new OperationResult(OperationResult.Status.OK, msg);
+        } catch (Exception e) {
             String errorMsg = "Ошибка при выполнении операции truncate: " + e.getMessage();
             logger.error("Внештатная ситуация: {}", errorMsg, e);
-            return new OperationStatus(OperationStatus.Status.ERROR, errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
 
@@ -421,18 +427,18 @@ public class WorkingDirectory {
      * Рекурсивный вспомогательный метод для очистки содержимого каталога перед удалением.
      *
      * @param dir        каталог для очистки
-     * @param includeSbd флаг разрешения рекурсивного удаления вложенных папок
+     * @param includeSubdirectories флаг разрешения рекурсивного удаления вложенных папок
      * @return true, если удаление прошло успешно
      */
-    private boolean deleteSb(File dir, boolean includeSbd) {
+    private boolean deleteSb(File dir, boolean includeSubdirectories) {
         File[] files = dir.listFiles();
         if (files == null) return true;
         boolean result = true;
         for (File f : files) {
             if (!f.isDirectory()) {
                 result = f.delete() && result;
-            } else if (includeSbd) {
-                result = deleteSb(f, includeSbd) && f.delete() && result;
+            } else if (includeSubdirectories) {
+                result = deleteSb(f, includeSubdirectories) && f.delete() && result;
             }
         }
         return result;

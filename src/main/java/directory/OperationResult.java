@@ -2,7 +2,7 @@ package directory;
 
 import lombok.NonNull;
 
-public record OperationStatus(@NonNull Status status, @NonNull String message) {
+public record OperationResult(@NonNull Status status, @NonNull String message) {
 
     public enum Status {
         OK,

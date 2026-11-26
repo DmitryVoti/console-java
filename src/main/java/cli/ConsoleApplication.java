@@ -1,6 +1,6 @@
 package cli;
 
-import directory.OperationStatus;
+import directory.OperationResult;
 import directory.WorkingDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +31,8 @@ public class ConsoleApplication {
             // Инициализация рабочего каталога
             wd = WorkingDirectory.getInstance("my_folder");
 
-            boolean programToggler = true;
-            while (programToggler) {
+            boolean isRunning = true;
+            while (isRunning) {
                 try {
                     wd.printCurrentDirectory();
                     String input = scan.nextLine().strip();
@@ -48,7 +48,7 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     logger.warn("Внештатная ситуация: команда 'cd' вызвана без аргументов");
                                 } else {
-                                    OperationStatus status = wd.toSubdirectory(words[words.length - 1]);
+                                    OperationResult status = wd.toSubdirectory(words[words.length - 1]);
                                     handleStatus(status);
                                 }
                                 break;
@@ -58,20 +58,20 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     logger.warn("Внештатная ситуация: команда 'istChildSbd' вызвана без аргументов");
                                 } else {
-                                    OperationStatus status = wd.isItChildDirectory(words[words.length - 1]);
+                                    OperationResult status = wd.isItChildDirectory(words[words.length - 1]);
                                     handleStatus(status);
                                 }
                                 break;
 
                             case "parPath":
-                                OperationStatus parStatus = wd.printParentPath();
+                                OperationResult parStatus = wd.printParentPath();
                                 handleStatus(parStatus);
                                 break;
 
                             case "dir":
                                 boolean onlyDirectoryFlag = Arrays.asList(words).contains("-d");
                                 boolean onlyFirstLevelSearchFlag = !Arrays.asList(words).contains("-all");
-                                OperationStatus dirStatus = wd.print(onlyDirectoryFlag, onlyFirstLevelSearchFlag);
+                                OperationResult dirStatus = wd.print(onlyDirectoryFlag, onlyFirstLevelSearchFlag);
                                 handleStatus(dirStatus);
                                 break;
 
@@ -87,7 +87,7 @@ public class ConsoleApplication {
                                     targetPath = words[1];
                                 }
 
-                                OperationStatus treeStatus = wd.drawFileTree(targetPath);
+                                OperationResult treeStatus = wd.drawFileTree(targetPath);
                                 handleStatus(treeStatus);
                                 break;
 
@@ -96,7 +96,7 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     logger.warn("Внештатная ситуация: команда 'mkdir' вызвана без аргументов");
                                 } else {
-                                    OperationStatus status = wd.createNewDirectory(words[words.length - 1]);
+                                    OperationResult status = wd.createNewDirectory(words[words.length - 1]);
                                     handleStatus(status);
                                 }
                                 break;
@@ -106,7 +106,7 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     logger.warn("Внештатная ситуация: команда 'find' вызвана без аргументов");
                                 } else {
-                                    OperationStatus status = wd.findFile(words[words.length - 1], Arrays.asList(words).contains("-d"));
+                                    OperationResult status = wd.findFile(words[words.length - 1], Arrays.asList(words).contains("-d"));
                                     handleStatus(status);
                                 }
                                 break;
@@ -116,11 +116,11 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     logger.warn("Внештатная ситуация: команда 'truncate' вызвана без аргументов");
                                 } else if (Arrays.asList(words).contains("-d") && words.length >= 3) {
-                                    OperationStatus truncStatus = wd.truncate(words[words.length - 1], true);
+                                    OperationResult truncStatus = wd.truncate(words[words.length - 1], true);
                                     handleStatus(truncStatus);
                                 }
                                 else {
-                                    OperationStatus truncStatus = wd.truncate(words[words.length - 1], false);
+                                    OperationResult truncStatus = wd.truncate(words[words.length - 1], false);
                                     handleStatus(truncStatus);
                                 }
                                 break;
@@ -131,7 +131,7 @@ public class ConsoleApplication {
                                 break;
 
                             case "exit":
-                                programToggler = false;
+                                isRunning = false;
                                 logger.info("Штатная ситуация: завершение работы программы пользователем");
                                 break;
 
@@ -155,8 +155,8 @@ public class ConsoleApplication {
         }
     }
 
-    private static void handleStatus(OperationStatus status) {
-        if (status.status() == OperationStatus.Status.OK) {
+    private static void handleStatus(OperationResult status) {
+        if (status.status() == OperationResult.Status.OK) {
             logger.info("Штатная ситуация: {}", status.message());
         } else {
             System.out.println("Ошибка: " + status.message());
