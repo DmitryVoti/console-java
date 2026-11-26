@@ -74,9 +74,6 @@ public class Main {
                                 break;
 
                             case "tree":
-<<<<<<< HEAD
-                                OperationStatus treeStatus = wd.drawFileTree(null);
-=======
                                 String targetPath = null;
                                 for (int i = 1; i < words.length; i++) {
                                     if (("-o".equals(words[i]) || "--output".equals(words[i])) && i + 1 < words.length) {
@@ -89,7 +86,6 @@ public class Main {
                                 }
 
                                 OperationStatus treeStatus = wd.drawFileTree(targetPath);
->>>>>>> c640b35d43c3e3d7715ed2f2942938cf54616a5b
                                 handleStatus(treeStatus);
                                 break;
 
