@@ -85,16 +85,16 @@ public class WorkingDirectory {
      * @param firstLevelOnly если true, выполнять поиск только на первом уровне вложений
      * @return объект {@link OperationResult} со статусом выполнения операции
      */
-    public OperationResult print(boolean directoriesOnly, boolean firstLevelOnly) {
+    public OperationResult print(final boolean directoriesOnly, final boolean firstLevelOnly) {
         try {
-            File dir = new File(directoryName);
+            val dir = new File(directoryName);
             printRecursive(dir, "", directoriesOnly, firstLevelOnly);
-            String msg = "Выведено содержимое каталога: " + directoryName;
+            val msg = "Выведено содержимое каталога: " + directoryName;
             log.info("Штатная ситуация: {}", msg);
             return new OperationResult(OperationResult.Status.OK, msg);
-        } catch (Exception e) {
-            String errorMsg = "Ошибка при выводе содержимого: " + e.getMessage();
-            log.error("Внештатная ситуация: {}", errorMsg, e);
+        } catch (Exception thrown) {
+            val errorMsg = "Ошибка при выводе содержимого: " + thrown.getMessage();
+            log.error("Внештатная ситуация: {}", errorMsg, thrown);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
@@ -109,10 +109,11 @@ public class WorkingDirectory {
      * @throws IOException если путь не существует
      */
     private void printRecursive(
-        File dir,
-        String prefix,
-        boolean directoriesOnly,
-        boolean firstLevelOnly) throws IOException {
+        final File dir,
+        final String prefix,
+        final boolean directoriesOnly,
+        final boolean firstLevelOnly) throws IOException {
+
         if (!dir.exists()) {
             throw new IOException("Путь не существует: " + dir.getAbsolutePath());
         }
@@ -121,10 +122,12 @@ public class WorkingDirectory {
             System.out.println(prefix + dir.getName());
         }
         if (filesInDir != null) {
-            for (File currentFile : filesInDir) {
+            for (var currentFile : filesInDir) {
                 if (firstLevelOnly) {
                     if (directoriesOnly) {
-                        if (currentFile.isDirectory()) System.out.println(prefix + "│  " + currentFile.getName());
+                        if (currentFile.isDirectory()) {
+                            System.out.println(prefix + "│  " + currentFile.getName());
+                        }
                     } else {
                         System.out.println(prefix + "│  " + currentFile.getName());
                     }
