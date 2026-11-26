@@ -154,11 +154,11 @@ public class Main {
     }
 
     private static void handleStatus(OperationStatus status) {
-        if (status.getStatus() == OperationStatus.Status.OK) {
-            logger.info("Штатная ситуация: {}", status.getMessage());
+        if (status.status() == OperationStatus.Status.OK) {
+            logger.info("Штатная ситуация: {}", status.message());
         } else {
-            System.out.println("Ошибка: " + status.getMessage());
-            logger.warn("Внештатная ситуация: {}", status.getMessage());
+            System.out.println("Ошибка: " + status.message());
+            logger.warn("Внештатная ситуация: {}", status.message());
         }
     }
 

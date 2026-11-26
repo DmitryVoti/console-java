@@ -151,7 +151,7 @@ class WorkingDirectoryTest {
 
         OperationStatus s = wd.toSubdirectory(".");
 
-        assertEquals(OperationStatus.Status.OK, s.getStatus());
+        assertEquals(OperationStatus.Status.OK, s.status());
         assertEquals(before, wd.getDirectoryName());
     }
 
@@ -160,7 +160,7 @@ class WorkingDirectoryTest {
     void toSubdirectory_NonExistent_ReturnsError() throws IOException {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.toSubdirectory("nope");
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
     }
 
     @Test
@@ -168,7 +168,7 @@ class WorkingDirectoryTest {
     void toSubdirectory_File_ReturnsError() throws IOException {
         WorkingDirectory wd = WorkingDirectory.getInstance("my_folder/documents");
         OperationStatus s = wd.toSubdirectory("readme.txt");
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
     }
 
     // ==================== createNewDirectory ====================
@@ -186,7 +186,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.createNewDirectory("a/b");
 
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
         assertFalse(Files.exists(Paths.get("my_folder/a")));
     }
 
@@ -196,7 +196,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.createNewDirectory("new_dir");
 
-        assertEquals(OperationStatus.Status.OK, s.getStatus());
+        assertEquals(OperationStatus.Status.OK, s.status());
         assertTrue(Files.isDirectory(Paths.get("my_folder/new_dir")));
     }
 
@@ -205,7 +205,7 @@ class WorkingDirectoryTest {
     void createNewDirectory_AlreadyExists_ReturnsError() throws IOException {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.createNewDirectory("documents");
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
     }
 
     // ==================== findFile ====================
@@ -265,7 +265,7 @@ class WorkingDirectoryTest {
     void findFile_StatusOk() throws IOException {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.findFile("readme", false);
-        assertEquals(OperationStatus.Status.OK, s.getStatus());
+        assertEquals(OperationStatus.Status.OK, s.status());
     }
 
     // ==================== truncate ====================
@@ -275,7 +275,7 @@ class WorkingDirectoryTest {
     void truncate_Null_ReturnsError() throws IOException {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.truncate(null, false);
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
     }
 
     @Test
@@ -284,7 +284,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.truncate("documents/readme.txt", false);
 
-        assertEquals(OperationStatus.Status.OK, s.getStatus());
+        assertEquals(OperationStatus.Status.OK, s.status());
         assertFalse(Files.exists(Paths.get("my_folder/documents/readme.txt")));
     }
 
@@ -294,7 +294,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.truncate("projects", false);
 
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
         assertTrue(Files.isDirectory(Paths.get("my_folder/projects")));
         assertTrue(Files.isDirectory(Paths.get("my_folder/projects/java")));
     }
@@ -305,7 +305,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.truncate("projects", true);
 
-        assertEquals(OperationStatus.Status.OK, s.getStatus());
+        assertEquals(OperationStatus.Status.OK, s.status());
         assertFalse(Files.exists(Paths.get("my_folder/projects")));
     }
 
@@ -314,7 +314,7 @@ class WorkingDirectoryTest {
     void truncate_NonExistent_ReturnsError() throws IOException {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.truncate("no_such", true);
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
     }
 
     // ==================== isItChildDirectory ====================
@@ -325,7 +325,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.isItChildDirectory(null);
 
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
         assertEquals("", getOutput());
     }
 
@@ -335,7 +335,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.isItChildDirectory("");
 
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
         assertEquals("", getOutput());
     }
 
@@ -344,7 +344,7 @@ class WorkingDirectoryTest {
     void isItChildDirectory_Blank_ReturnsError() throws IOException {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.isItChildDirectory("   ");
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
     }
 
     @Test
@@ -353,7 +353,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.isItChildDirectory("documents");
 
-        assertEquals(OperationStatus.Status.OK, s.getStatus());
+        assertEquals(OperationStatus.Status.OK, s.status());
         assertEquals("true", getOutput());
     }
 
@@ -363,7 +363,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.isItChildDirectory("nope");
 
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
         assertEquals("false", getOutput());
     }
 
@@ -373,7 +373,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = WorkingDirectory.getInstance("my_folder/documents");
         OperationStatus s = wd.isItChildDirectory("readme.txt");
 
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
         assertEquals("false", getOutput());
     }
 
@@ -387,7 +387,7 @@ class WorkingDirectoryTest {
 
         OperationStatus s = wd.print(false, true);
 
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
     }
 
     @Test
@@ -398,23 +398,23 @@ class WorkingDirectoryTest {
 
         OperationStatus s = wd.drawFileTree(null);
 
-        assertEquals(OperationStatus.Status.ERROR, s.getStatus());
-        assertTrue(s.getMessage().contains("не существует"),
-                "Ожидалось сообщение про отсутствие пути, получено: " + s.getMessage());
+        assertEquals(OperationStatus.Status.ERROR, s.status());
+        assertTrue(s.message().contains("не существует"),
+                "Ожидалось сообщение про отсутствие пути, получено: " + s.message());
     }
 
     @Test
     @DisplayName("print: статус OK при существующем каталоге")
     void print_StatusOk() throws IOException {
         WorkingDirectory wd = fresh();
-        assertEquals(OperationStatus.Status.OK, wd.print(false, true).getStatus());
+        assertEquals(OperationStatus.Status.OK, wd.print(false, true).status());
     }
 
     @Test
     @DisplayName("drawFileTree: статус OK при существующем каталоге")
     void drawFileTree_StatusOk() throws IOException {
         WorkingDirectory wd = fresh();
-        assertEquals(OperationStatus.Status.OK, wd.drawFileTree(null).getStatus());
+        assertEquals(OperationStatus.Status.OK, wd.drawFileTree(null).status());
     }
 
     @Test
@@ -423,7 +423,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         OperationStatus s = wd.printParentPath();
 
-        assertEquals(OperationStatus.Status.OK, s.getStatus());
+        assertEquals(OperationStatus.Status.OK, s.status());
         assertEquals(Paths.get("my_folder").toRealPath().getParent().toString(), getOutput());
     }
 
@@ -433,7 +433,7 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = WorkingDirectory.getInstance("my_folder/documents");
         OperationStatus s = wd.toParentDirectory();
 
-        assertEquals(OperationStatus.Status.OK, s.getStatus());
+        assertEquals(OperationStatus.Status.OK, s.status());
         assertEquals(canonical("my_folder"), wd.getDirectoryName());
     }
 
@@ -536,7 +536,7 @@ class WorkingDirectoryTest {
 
         OperationStatus s = wd.drawFileTree(targetDir);
 
-        assertEquals(OperationStatus.Status.OK, s.getStatus());
+        assertEquals(OperationStatus.Status.OK, s.status());
         File expectedFile = new File(targetDir, "directory_structure.txt");
         assertTrue(expectedFile.exists(), "Файл directory_structure.txt должен быть создан");
         assertTrue(expectedFile.length() > 0, "Файл не должен быть пустым");
@@ -549,11 +549,11 @@ class WorkingDirectoryTest {
         String initial = wd.getDirectoryName();
 
         OperationStatus s = wd.toSubdirectory("documents");
-        assertEquals(OperationStatus.Status.OK, s.getStatus());
+        assertEquals(OperationStatus.Status.OK, s.status());
         assertTrue(wd.getDirectoryName().endsWith("documents"));
 
         OperationStatus sBack = wd.toSubdirectory("..");
-        assertEquals(OperationStatus.Status.OK, sBack.getStatus());
+        assertEquals(OperationStatus.Status.OK, sBack.status());
         assertEquals(initial, wd.getDirectoryName());
     }
 
@@ -565,10 +565,10 @@ class WorkingDirectoryTest {
         WorkingDirectory rootWd = WorkingDirectory.getInstance(rootFile.getAbsolutePath());
 
         OperationStatus printStatus = rootWd.printParentPath();
-        assertEquals(OperationStatus.Status.ERROR, printStatus.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, printStatus.status());
 
         OperationStatus jumpStatus = rootWd.toParentDirectory();
-        assertEquals(OperationStatus.Status.ERROR, jumpStatus.getStatus());
+        assertEquals(OperationStatus.Status.ERROR, jumpStatus.status());
     }
 }
 
