@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Stream;
 
 /**
  * Класс, реализующий управление рабочим каталогом в соответствии с паттерном проектирования «Одиночка» (Singleton).
@@ -21,12 +20,6 @@ import java.util.stream.Stream;
 @Slf4j
 public class WorkingDirectory {
     private static WorkingDirectory instance;
-    /**
-     * -- GETTER --
-     * Возвращает абсолютный путь текущего рабочего каталога.
-     *
-     * @return строка с путем к каталогу
-     */
     private String directoryName;
 
     /**
@@ -327,27 +320,30 @@ public class WorkingDirectory {
      * @param name имя создаваемой папки
      * @return объект {@link OperationResult} со статусом выполнения
      */
-    public OperationResult createNewDirectory(String name) {
-        File dir = new File(directoryName);
-        File subFolder = new File(dir, name);
-
+    public OperationResult createNewDirectory(final String name) {
+        val dir = new File(directoryName);
+        if (StringUtils.isBlank(name)) {
+            val errorMsg = "Имя подкаталога не может быть пустым";
+            log.warn("Внештатная ситуация: {}", errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
+        }
+        val subFolder = new File(dir, name);
         if (!dir.exists()) {
-            String errorMsg = "Невозможно создать подкаталог, родительский каталог не существует: " + directoryName;
+            val errorMsg = "Невозможно создать подкаталог, родительский каталог не существует: " + directoryName;
             log.error("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
         if (subFolder.exists()) {
-            String errorMsg = "Подкаталог '" + name + "' уже существует";
+            val errorMsg = "Подкаталог '" + name + "' уже существует";
             log.warn("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
         if (!subFolder.mkdir()) {
-            String errorMsg = "Не удалось создать подкаталог: " + name;
+            val errorMsg = "Не удалось создать подкаталог: " + name;
             log.error("Внештатная ситуация: {}", errorMsg);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
-
-        String successMsg = "Подкаталог успешно создан: " + subFolder.getAbsolutePath();
+        val successMsg = "Подкаталог успешно создан: " + subFolder.getAbsolutePath();
         System.out.println("Подкаталог успешно создан: " + subFolder.getName());
         log.info("Штатная ситуация: {}", successMsg);
         return new OperationResult(OperationResult.Status.OK, successMsg);
@@ -360,14 +356,19 @@ public class WorkingDirectory {
      * @param onlyDirectories если true, искать только директории
      * @return объект {@link OperationResult} со статусом выполнения
      */
-    public OperationResult findFile(String filename, boolean onlyDirectories) {
-        try (Stream<Path> stream = Files.walk(Paths.get(directoryName))) {
+    public OperationResult findFile(final String filename, final boolean onlyDirectories) {
+        if (StringUtils.isBlank(filename)) {
+            val errorMsg = "Имя искомого файла или каталога не может быть пустым";
+            log.warn("Внештатная ситуация: {}", errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
+        }
+        try (val stream = Files.walk(Paths.get(directoryName))) {
             if (!onlyDirectories) {
                 stream.filter(Files::isRegularFile)
                     .map(Path::toAbsolutePath)
-                    .filter(p -> {
-                        String name = p.getFileName().toString().toLowerCase();
-                        String search = filename.toLowerCase();
+                    .filter(path -> {
+                        val name = path.getFileName().toString().toLowerCase();
+                        val search = filename.toLowerCase();
                         return search.startsWith(".") ? name.endsWith(search) : name.contains(search);
                     })
                     .map(Path::toString)
@@ -375,20 +376,20 @@ public class WorkingDirectory {
             } else {
                 stream.filter(Files::isDirectory)
                     .map(Path::toAbsolutePath)
-                    .filter(p -> {
-                        String name = p.getFileName().toString().toLowerCase();
-                        String search = filename.toLowerCase();
+                    .filter(path -> {
+                        val name = path.getFileName().toString().toLowerCase();
+                        val search = filename.toLowerCase();
                         return name.contains(search);
                     })
                     .map(Path::toString)
                     .forEach(System.out::println);
             }
-            String msg = "Поиск '" + filename + "' успешно выполнен";
+            val msg = "Поиск '" + filename + "' успешно выполнен";
             log.info("Штатная ситуация: {}", msg);
             return new OperationResult(OperationResult.Status.OK, msg);
-        } catch (IOException e) {
-            String errorMsg = "Ошибка при поиске файла '" + filename + "': " + e.getMessage();
-            log.error("Внештатная ситуация: {}", errorMsg, e);
+        } catch (IOException thrown) {
+            val errorMsg = "Ошибка при поиске файла '" + filename + "': " + thrown.getMessage();
+            log.error("Внештатная ситуация: {}", errorMsg, thrown);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
@@ -401,27 +402,33 @@ public class WorkingDirectory {
      * @param includeSubdirectories если true, удалять каталог вместе со всем содержимым
      * @return объект {@link OperationResult} со статусом выполнения
      */
-    public OperationResult truncate(String filename, boolean includeSubdirectories) {
+    public OperationResult truncate(final String filename, final boolean includeSubdirectories) {
+        if (StringUtils.isBlank(filename)) {
+            val errorMsg = "Имя файла или каталога для удаления не может быть пустым";
+            log.warn("Внештатная ситуация: {}", errorMsg);
+            return new OperationResult(OperationResult.Status.ERROR, errorMsg);
+        }
         try {
-            File file = new File(directoryName, filename);
+            val file = new File(directoryName, filename);
             if (!file.exists()) {
-                String errorMsg = "Не удалось удалить, " + filename + " не существует.";
+                val errorMsg = "Не удалось удалить, " + filename + " не существует.";
                 log.warn("Внештатная ситуация: {}", errorMsg);
                 return new OperationResult(OperationResult.Status.ERROR, errorMsg);
             }
-            boolean success = deleteSb(file, includeSubdirectories);
-            success = file.delete() && success;
+            val deletedContents = deleteSb(file, includeSubdirectories);
+            val deletedTarget = file.delete();
+            val success = deletedContents && deletedTarget;
             if (!success) {
-                String errorMsg = "Не удалось полностью удалить: " + filename;
+                val errorMsg = "Не удалось полностью удалить: " + filename;
                 log.warn("Внештатная ситуация: {}", errorMsg);
                 return new OperationResult(OperationResult.Status.ERROR, errorMsg);
             }
-            String msg = "Успешно удалено: " + filename;
+            val msg = "Успешно удалено: " + filename;
             log.info("Штатная ситуация: {}", msg);
             return new OperationResult(OperationResult.Status.OK, msg);
-        } catch (Exception e) {
-            String errorMsg = "Ошибка при выполнении операции truncate: " + e.getMessage();
-            log.error("Внештатная ситуация: {}", errorMsg, e);
+        } catch (Exception thrown) {
+            val errorMsg = "Ошибка при выполнении операции truncate: " + thrown.getMessage();
+            log.error("Внештатная ситуация: {}", errorMsg, thrown);
             return new OperationResult(OperationResult.Status.ERROR, errorMsg);
         }
     }
@@ -433,15 +440,20 @@ public class WorkingDirectory {
      * @param includeSubdirectories флаг разрешения рекурсивного удаления вложенных папок
      * @return true, если удаление прошло успешно
      */
-    private boolean deleteSb(File dir, boolean includeSubdirectories) {
-        File[] files = dir.listFiles();
-        if (files == null) return true;
+    private boolean deleteSb(final File dir, final boolean includeSubdirectories) {
+        val files = dir.listFiles();
+        if (files == null) {
+            return true;
+        }
         boolean result = true;
-        for (File f : files) {
-            if (!f.isDirectory()) {
-                result = f.delete() && result;
+        for (val file : files) {
+            if (!file.isDirectory()) {
+                val deletedFile = file.delete();
+                result = deletedFile && result;
             } else if (includeSubdirectories) {
-                result = deleteSb(f, includeSubdirectories) && f.delete() && result;
+                val deletedSubtree = deleteSb(file, true);
+                val deletedSubdirectory = file.delete();
+                result = deletedSubtree && deletedSubdirectory && result;
             }
         }
         return result;
