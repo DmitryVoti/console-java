@@ -1,6 +1,8 @@
 package directory;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -14,9 +16,16 @@ import java.util.stream.Stream;
  * Обеспечивает навигацию по файловой системе, просмотр содержимого, создание и удаление директорий,
  * а также поиск файлов и построение дерева каталогов.
  */
+@Getter
 @Slf4j
 public class WorkingDirectory {
     private static WorkingDirectory instance;
+    /**
+     * -- GETTER --
+     *  Возвращает абсолютный путь текущего рабочего каталога.
+     *
+     * @return строка с путем к каталогу
+     */
     private String directoryName;
 
     /**
@@ -39,15 +48,15 @@ public class WorkingDirectory {
      * @return единственный экземпляр {@link WorkingDirectory}
      * @throws IOException если каталог не существует или путь не является директорией
      */
-    public static WorkingDirectory getInstance(String directoryName) throws IOException {
-        File dir = new File(directoryName);
+    public static WorkingDirectory getInstance(final String directoryName) throws IOException {
+        val dir = new File(directoryName);
         if (!dir.exists()) {
-            String errorMsg = "Каталога не существует: " + directoryName;
+            val errorMsg = "Каталога не существует: " + directoryName;
             log.error("Внештатная ситуация при getInstance: {}", errorMsg);
             throw new IOException(errorMsg);
         }
         if (!dir.isDirectory()) {
-            String errorMsg = "Путь не является каталогом: " + directoryName;
+            val errorMsg = "Путь не является каталогом: " + directoryName;
             log.error("Внештатная ситуация при getInstance: {}", errorMsg);
             throw new IOException(errorMsg);
         }
@@ -58,15 +67,6 @@ public class WorkingDirectory {
             log.info("Экземпляр Singleton обновлен на каталог: {}", instance.directoryName);
         }
         return instance;
-    }
-
-    /**
-     * Возвращает абсолютный путь текущего рабочего каталога.
-     *
-     * @return строка с путем к каталогу
-     */
-    public String getDirectoryName() {
-        return directoryName;
     }
 
     /**
