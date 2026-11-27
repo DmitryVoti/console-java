@@ -109,7 +109,9 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     log.warn("Внештатная ситуация: команда 'find' вызвана без аргументов");
                                 } else {
-                                    val status = wd.findFile(words[words.length - 1], Arrays.asList(words).contains("-d"));
+                                    val status = wd.findFile(
+                                        words[words.length - 1],
+                                        Arrays.asList(words).contains("-d"));
                                     handleStatus(status);
                                 }
                                 break;
