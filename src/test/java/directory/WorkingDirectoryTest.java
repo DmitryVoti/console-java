@@ -1,5 +1,6 @@
 package directory;
 
+import lombok.val;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -146,10 +147,11 @@ class WorkingDirectoryTest {
     // ==================== toSubdirectory ====================
 
     @Test
-    @DisplayName("toSubdirectory(null): NPE (не перехватывается)")
+    @DisplayName("toSubdirectory(null): ошибка для пустого ввода")
     void toSubdirectory_Null_ThrowsNPE() throws IOException {
         WorkingDirectory wd = fresh();
-        assertThrows(NullPointerException.class, () -> wd.toSubdirectory(null));
+        val currentResult = wd.toSubdirectory(null);
+        assertEquals(OperationResult.Status.ERROR, currentResult.status());
     }
 
     @Test
@@ -183,10 +185,11 @@ class WorkingDirectoryTest {
     // ==================== createNewDirectory ====================
 
     @Test
-    @DisplayName("createNewDirectory(null): NPE")
+    @DisplayName("createNewDirectory(null): ошибка для пустого ввода")
     void createNewDirectory_Null_ThrowsNPE() throws IOException {
         WorkingDirectory wd = fresh();
-        assertThrows(NullPointerException.class, () -> wd.createNewDirectory(null));
+        val currentResult = wd.createNewDirectory(null);
+        assertEquals(OperationResult.Status.ERROR, currentResult.status());
     }
 
     @Test
@@ -220,30 +223,19 @@ class WorkingDirectoryTest {
     // ==================== findFile ====================
 
     @Test
-    @DisplayName("findFile(null): NPE (catch ловит только IOException)")
+    @DisplayName("findFile(null): возвращает статус ERROR")
     void findFile_Null_ThrowsNPE() throws IOException {
         WorkingDirectory wd = fresh();
-        assertThrows(NullPointerException.class, () -> wd.findFile(null, false));
+        val currentResult = wd.findFile(null, false);
+        assertEquals(OperationResult.Status.ERROR, currentResult.status());
     }
 
     @Test
-    @DisplayName("findFile(\"\"): возвращает все файлы")
+    @DisplayName("findFile(\"\"): ошибка пустого файла")
     void findFile_Empty_ReturnsAllFiles() throws IOException {
         WorkingDirectory wd = fresh();
-        wd.findFile("", false);
-
-        Set<String> names = Arrays.stream(getOutput().split("\n"))
-            .filter(s -> !s.isBlank())
-            .map(p -> Paths.get(p).getFileName().toString())
-            .collect(Collectors.toSet());
-
-        assertEquals(
-            Set.of(
-                "readme.txt", "report.pdf", "notes.docx",
-                "Main.java", "Utils.class",
-                "index.html", "style.css",
-                "archive.zip", "photo.png", "music.mp3"
-            ), names);
+        val currentResult = wd.findFile("", false);
+        assertEquals(OperationResult.Status.ERROR, currentResult.status());
     }
 
     @Test
