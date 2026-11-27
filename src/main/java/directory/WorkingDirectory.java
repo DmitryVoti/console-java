@@ -111,7 +111,7 @@ public class WorkingDirectory {
         if (!dir.exists()) {
             throw new IOException("Путь не существует: " + dir.getAbsolutePath());
         }
-        File[] filesInDir = dir.listFiles();
+        val filesInDir = dir.listFiles();
         if (!(directoriesOnly && dir.isFile())) {
             System.out.println(prefix + dir.getName());
         }
