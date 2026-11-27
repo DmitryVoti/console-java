@@ -106,7 +106,7 @@ class WorkingDirectoryTest {
 
     @Test
     @DisplayName("getInstance(путь к файлу) → IOException")
-    void getInstance_File_ThrowsIOException() throws IOException {
+    void getInstance_File_ThrowsIOException() {
         String filePath = "my_folder/documents/readme.txt";
         assertTrue(Files.isRegularFile(Paths.get(filePath)));
 
@@ -236,7 +236,7 @@ class WorkingDirectoryTest {
     }
 
     @Test
-    @DisplayName("findFile: регистронезависимый поиск")
+    @DisplayName("findFile: регистронезависимый  поиск")
     void findFile_CaseInsensitive() throws IOException {
         WorkingDirectory wd = fresh();
         wd.findFile("README", false);
@@ -289,7 +289,7 @@ class WorkingDirectoryTest {
 
     @Test
     @DisplayName("truncate: каталог с подкаталогами + includeSubdirectories=false → ERROR")
-    void truncate_DirWithSubdirs_IncludeFalse_ReturnsError() throws IOException {
+    void truncate_DirWithSubdirectories_IncludeFalse_ReturnsError() throws IOException {
         WorkingDirectory wd = fresh();
         OperationResult s = wd.truncate("projects", false);
 
@@ -300,7 +300,7 @@ class WorkingDirectoryTest {
 
     @Test
     @DisplayName("truncate: каталог с подкаталогами + includeSubdirectories=true → OK")
-    void truncate_DirWithSubdirs_IncludeTrue_ReturnsOk() throws IOException {
+    void truncate_DirWithSubdirectories_IncludeTrue_ReturnsOk() throws IOException {
         WorkingDirectory wd = fresh();
         OperationResult s = wd.truncate("projects", true);
 
@@ -451,11 +451,12 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         wd.print(false, true);
 
-        String expected = "my_folder\n"
-            + "│  documents\n"
-            + "│  downloads\n"
-            + "│  empty_subfolder\n"
-            + "│  projects";
+        String expected = """
+            my_folder
+            │  documents
+            │  downloads
+            │  empty_subfolder
+            │  projects""";
         assertEquals(expected, getOutput());
     }
 
@@ -465,13 +466,14 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         wd.print(true, false);
 
-        String expected = "my_folder\n"
-            + "│  documents\n"
-            + "│  downloads\n"
-            + "│  empty_subfolder\n"
-            + "│  projects\n"
-            + "│  │  java\n"
-            + "│  │  web";
+        String expected = """
+            my_folder
+            │  documents
+            │  downloads
+            │  empty_subfolder
+            │  projects
+            │  │  java
+            │  │  web""";
         assertEquals(expected, getOutput());
     }
 
@@ -481,23 +483,24 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         wd.print(false, false);
 
-        String expected = "my_folder\n"
-            + "│  documents\n"
-            + "│  │  notes.docx\n"
-            + "│  │  readme.txt\n"
-            + "│  │  report.pdf\n"
-            + "│  downloads\n"
-            + "│  │  archive.zip\n"
-            + "│  │  music.mp3\n"
-            + "│  │  photo.png\n"
-            + "│  empty_subfolder\n"
-            + "│  projects\n"
-            + "│  │  java\n"
-            + "│  │  │  Main.java\n"
-            + "│  │  │  Utils.class\n"
-            + "│  │  web\n"
-            + "│  │  │  index.html\n"
-            + "│  │  │  style.css";
+        String expected = """
+            my_folder
+            │  documents
+            │  │  notes.docx
+            │  │  readme.txt
+            │  │  report.pdf
+            │  downloads
+            │  │  archive.zip
+            │  │  music.mp3
+            │  │  photo.png
+            │  empty_subfolder
+            │  projects
+            │  │  java
+            │  │  │  Main.java
+            │  │  │  Utils.class
+            │  │  web
+            │  │  │  index.html
+            │  │  │  style.css""";
         assertEquals(expected, getOutput());
     }
 
@@ -507,23 +510,24 @@ class WorkingDirectoryTest {
         WorkingDirectory wd = fresh();
         wd.drawFileTree(null);
 
-        String expected = "my_folder\n"
-            + "├── documents\n"
-            + "│   ├── notes.docx\n"
-            + "│   ├── readme.txt\n"
-            + "│   └── report.pdf\n"
-            + "├── downloads\n"
-            + "│   ├── archive.zip\n"
-            + "│   ├── music.mp3\n"
-            + "│   └── photo.png\n"
-            + "├── empty_subfolder\n"
-            + "└── projects\n"
-            + "    ├── java\n"
-            + "    │   ├── Main.java\n"
-            + "    │   └── Utils.class\n"
-            + "    └── web\n"
-            + "        ├── index.html\n"
-            + "        └── style.css";
+        String expected = """
+            my_folder
+            ├── documents
+            │   ├── notes.docx
+            │   ├── readme.txt
+            │   └── report.pdf
+            ├── downloads
+            │   ├── archive.zip
+            │   ├── music.mp3
+            │   └── photo.png
+            ├── empty_subfolder
+            └── projects
+                ├── java
+                │   ├── Main.java
+                │   └── Utils.class
+                └── web
+                    ├── index.html
+                    └── style.css""";
         assertEquals(expected, getOutput());
     }
 
