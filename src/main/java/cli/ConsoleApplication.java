@@ -2,6 +2,7 @@ package cli;
 
 import directory.OperationResult;
 import directory.WorkingDirectory;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,11 +13,8 @@ import java.util.Scanner;
 public class ConsoleApplication {
     private static final Logger logger = LoggerFactory.getLogger(ConsoleApplication.class);
 
-    public static void run() {
-        logger.info("Запуск консольного приложения 'WorkingDirectory'");
-
-        Scanner scan = new Scanner(System.in);
-        File initialDir = new File("my_folder");
+    public static void initiateStartDirectory() {
+        val initialDir = new File("my_folder");
         if (!initialDir.exists()) {
             boolean created = initialDir.mkdir();
             if (created) {
@@ -26,6 +24,13 @@ public class ConsoleApplication {
             }
         }
 
+    }
+
+    public static void run() {
+        logger.info("Запуск консольного приложения 'WorkingDirectory'");
+
+        val scan = new Scanner(System.in);
+        initiateStartDirectory();
         WorkingDirectory wd;
         try {
             // Инициализация рабочего каталога
@@ -35,12 +40,12 @@ public class ConsoleApplication {
             while (isRunning) {
                 try {
                     wd.printCurrentDirectory();
-                    String input = scan.nextLine().strip();
+                    val input = scan.nextLine().strip();
                     if (input.isEmpty()) continue;
 
-                    String[] words = input.split("\\s+");
+                    val words = input.split("\\s+");
                     if (words.length > 0) {
-                        String command = words[0];
+                        val command = words[0];
 
                         switch (command) {
                             case "cd":
@@ -48,7 +53,7 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     logger.warn("Внештатная ситуация: команда 'cd' вызвана без аргументов");
                                 } else {
-                                    OperationResult status = wd.toSubdirectory(words[words.length - 1]);
+                                    val status = wd.toSubdirectory(words[words.length - 1]);
                                     handleStatus(status);
                                 }
                                 break;
@@ -58,20 +63,20 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     logger.warn("Внештатная ситуация: команда 'istChildSbd' вызвана без аргументов");
                                 } else {
-                                    OperationResult status = wd.isItChildDirectory(words[words.length - 1]);
+                                    val status = wd.isItChildDirectory(words[words.length - 1]);
                                     handleStatus(status);
                                 }
                                 break;
 
                             case "parPath":
-                                OperationResult parStatus = wd.printParentPath();
+                                val parStatus = wd.printParentPath();
                                 handleStatus(parStatus);
                                 break;
 
                             case "dir":
-                                boolean onlyDirectoryFlag = Arrays.asList(words).contains("-d");
-                                boolean onlyFirstLevelSearchFlag = !Arrays.asList(words).contains("-all");
-                                OperationResult dirStatus = wd.print(onlyDirectoryFlag, onlyFirstLevelSearchFlag);
+                                val onlyDirectoryFlag = Arrays.asList(words).contains("-d");
+                                val onlyFirstLevelSearchFlag = !Arrays.asList(words).contains("-all");
+                                val dirStatus = wd.print(onlyDirectoryFlag, onlyFirstLevelSearchFlag);
                                 handleStatus(dirStatus);
                                 break;
 
@@ -87,7 +92,7 @@ public class ConsoleApplication {
                                     targetPath = words[1];
                                 }
 
-                                OperationResult treeStatus = wd.drawFileTree(targetPath);
+                                val treeStatus = wd.drawFileTree(targetPath);
                                 handleStatus(treeStatus);
                                 break;
 
@@ -96,7 +101,7 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     logger.warn("Внештатная ситуация: команда 'mkdir' вызвана без аргументов");
                                 } else {
-                                    OperationResult status = wd.createNewDirectory(words[words.length - 1]);
+                                    val status = wd.createNewDirectory(words[words.length - 1]);
                                     handleStatus(status);
                                 }
                                 break;
@@ -106,7 +111,7 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     logger.warn("Внештатная ситуация: команда 'find' вызвана без аргументов");
                                 } else {
-                                    OperationResult status = wd.findFile(words[words.length - 1], Arrays.asList(words).contains("-d"));
+                                    val status = wd.findFile(words[words.length - 1], Arrays.asList(words).contains("-d"));
                                     handleStatus(status);
                                 }
                                 break;
@@ -116,11 +121,11 @@ public class ConsoleApplication {
                                     System.out.println("Недостаточно аргументов");
                                     logger.warn("Внештатная ситуация: команда 'truncate' вызвана без аргументов");
                                 } else if (Arrays.asList(words).contains("-d") && words.length >= 3) {
-                                    OperationResult truncStatus = wd.truncate(words[words.length - 1], true);
+                                    val truncStatus = wd.truncate(words[words.length - 1], true);
                                     handleStatus(truncStatus);
                                 }
                                 else {
-                                    OperationResult truncStatus = wd.truncate(words[words.length - 1], false);
+                                    val truncStatus = wd.truncate(words[words.length - 1], false);
                                     handleStatus(truncStatus);
                                 }
                                 break;
