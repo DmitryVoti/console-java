@@ -2,32 +2,30 @@ package cli;
 
 import directory.OperationResult;
 import directory.WorkingDirectory;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Scanner;
 
+@Slf4j
 public class ConsoleApplication {
-    private static final Logger logger = LoggerFactory.getLogger(ConsoleApplication.class);
-
     public static void initiateStartDirectory() {
         val initialDir = new File("my_folder");
         if (!initialDir.exists()) {
             boolean created = initialDir.mkdir();
             if (created) {
-                logger.info("Создан стартовый каталог: {}", initialDir.getAbsolutePath());
+                log.info("Создан стартовый каталог: {}", initialDir.getAbsolutePath());
             } else {
-                logger.error("Не удалось создать стартовый каталог: {}", initialDir.getAbsolutePath());
+                log.error("Не удалось создать стартовый каталог: {}", initialDir.getAbsolutePath());
             }
         }
 
     }
 
     public static void run() {
-        logger.info("Запуск консольного приложения 'WorkingDirectory'");
+        log.info("Запуск консольного приложения 'WorkingDirectory'");
 
         val scan = new Scanner(System.in);
         initiateStartDirectory();
@@ -51,7 +49,7 @@ public class ConsoleApplication {
                             case "cd":
                                 if (words.length < 2) {
                                     System.out.println("Недостаточно аргументов");
-                                    logger.warn("Внештатная ситуация: команда 'cd' вызвана без аргументов");
+                                    log.warn("Внештатная ситуация: команда 'cd' вызвана без аргументов");
                                 } else {
                                     val status = wd.toSubdirectory(words[words.length - 1]);
                                     handleStatus(status);
@@ -61,7 +59,7 @@ public class ConsoleApplication {
                             case "istChildSbd":
                                 if (words.length < 2) {
                                     System.out.println("Недостаточно аргументов");
-                                    logger.warn("Внештатная ситуация: команда 'istChildSbd' вызвана без аргументов");
+                                    log.warn("Внештатная ситуация: команда 'istChildSbd' вызвана без аргументов");
                                 } else {
                                     val status = wd.isItChildDirectory(words[words.length - 1]);
                                     handleStatus(status);
@@ -99,7 +97,7 @@ public class ConsoleApplication {
                             case "mkdir":
                                 if (words.length < 2) {
                                     System.out.println("Недостаточно аргументов");
-                                    logger.warn("Внештатная ситуация: команда 'mkdir' вызвана без аргументов");
+                                    log.warn("Внештатная ситуация: команда 'mkdir' вызвана без аргументов");
                                 } else {
                                     val status = wd.createNewDirectory(words[words.length - 1]);
                                     handleStatus(status);
@@ -109,7 +107,7 @@ public class ConsoleApplication {
                             case "find":
                                 if (words.length < 2) {
                                     System.out.println("Недостаточно аргументов");
-                                    logger.warn("Внештатная ситуация: команда 'find' вызвана без аргументов");
+                                    log.warn("Внештатная ситуация: команда 'find' вызвана без аргументов");
                                 } else {
                                     val status = wd.findFile(words[words.length - 1], Arrays.asList(words).contains("-d"));
                                     handleStatus(status);
@@ -119,7 +117,7 @@ public class ConsoleApplication {
                             case "truncate":
                                 if (words.length < 2) {
                                     System.out.println("Недостаточно аргументов");
-                                    logger.warn("Внештатная ситуация: команда 'truncate' вызвана без аргументов");
+                                    log.warn("Внештатная ситуация: команда 'truncate' вызвана без аргументов");
                                 } else if (Arrays.asList(words).contains("-d") && words.length >= 3) {
                                     val truncStatus = wd.truncate(words[words.length - 1], true);
                                     handleStatus(truncStatus);
@@ -132,40 +130,40 @@ public class ConsoleApplication {
 
                             case "help":
                                 printHelp();
-                                logger.info("Штатная ситуация: выведена справка по командам");
+                                log.info("Штатная ситуация: выведена справка по командам");
                                 break;
 
                             case "exit":
                                 isRunning = false;
-                                logger.info("Штатная ситуация: завершение работы программы пользователем");
+                                log.info("Штатная ситуация: завершение работы программы пользователем");
                                 break;
 
                             default:
                                 System.out.println("Неизвестная команда. Введите 'help' для справки.");
-                                logger.warn("Внештатная ситуация: введена неизвестная команда -> '{}'", command);
+                                log.warn("Внештатная ситуация: введена неизвестная команда -> '{}'", command);
                                 break;
                         }
                     }
                 } catch (Exception e) {
                     System.out.println("Ошибка: " + e.getMessage());
-                    logger.error("Внештатная ситуация: необработанное исключение во время выполнения команды", e);
+                    log.error("Внештатная ситуация: необработанное исключение во время выполнения команды", e);
                 }
             }
         } catch (Exception e) {
             System.out.println("Ошибка инициализации: " + e.getMessage());
-            logger.error("Критическая ошибка при инициализации WorkingDirectory", e);
+            log.error("Критическая ошибка при инициализации WorkingDirectory", e);
         } finally {
             scan.close();
-            logger.info("Программа завершила свою работу");
+            log.info("Программа завершила свою работу");
         }
     }
 
     private static void handleStatus(OperationResult status) {
         if (status.status() == OperationResult.Status.OK) {
-            logger.info("Штатная ситуация: {}", status.message());
+            log.info("Штатная ситуация: {}", status.message());
         } else {
             System.out.println("Ошибка: " + status.message());
-            logger.warn("Внештатная ситуация: {}", status.message());
+            log.warn("Внештатная ситуация: {}", status.message());
         }
     }
 
