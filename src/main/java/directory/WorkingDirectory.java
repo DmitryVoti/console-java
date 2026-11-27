@@ -29,7 +29,7 @@ public class WorkingDirectory {
      * @param directoryName путь к каталогу
      * @throws IOException если путь некорректен
      */
-    private WorkingDirectory(String directoryName) throws IOException {
+    private WorkingDirectory(final String directoryName) throws IOException {
         this.directoryName = new File(directoryName).getCanonicalPath();
         log.info("Инициализирован рабочий каталог Singleton: {}", this.directoryName);
     }
@@ -116,7 +116,7 @@ public class WorkingDirectory {
             System.out.println(prefix + dir.getName());
         }
         if (filesInDir != null) {
-            for (var currentFile : filesInDir) {
+            for (val currentFile : filesInDir) {
                 if (firstLevelOnly) {
                     if (directoriesOnly) {
                         if (currentFile.isDirectory()) {
@@ -188,7 +188,7 @@ public class WorkingDirectory {
      * @param ps     поток вывода (в файл или консоль)
      */
     private void drawFileTreeRecursive(final File dir, final String prefix, final PrintStream ps) {
-        File[] listFiles = dir.listFiles();
+        val listFiles = dir.listFiles();
         if (listFiles != null && listFiles.length > 0) {
             val length = listFiles.length;
             for (int index = 0; index < length - 1; index++) {
@@ -366,8 +366,8 @@ public class WorkingDirectory {
             if (!onlyDirectories) {
                 stream.filter(Files::isRegularFile)
                     .map(Path::toAbsolutePath)
-                    .filter(path -> {
-                        val name = path.getFileName().toString().toLowerCase();
+                    .filter(candidatePath -> {
+                        val name = candidatePath.getFileName().toString().toLowerCase();
                         val search = filename.toLowerCase();
                         return search.startsWith(".") ? name.endsWith(search) : name.contains(search);
                     })
@@ -376,8 +376,8 @@ public class WorkingDirectory {
             } else {
                 stream.filter(Files::isDirectory)
                     .map(Path::toAbsolutePath)
-                    .filter(path -> {
-                        val name = path.getFileName().toString().toLowerCase();
+                    .filter(candidatePath -> {
+                        val name = candidatePath.getFileName().toString().toLowerCase();
                         val search = filename.toLowerCase();
                         return name.contains(search);
                     })
