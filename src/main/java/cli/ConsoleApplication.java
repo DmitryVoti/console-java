@@ -14,14 +14,13 @@ public class ConsoleApplication {
     public static void initiateStartDirectory() {
         val initialDir = new File("my_folder");
         if (!initialDir.exists()) {
-            boolean created = initialDir.mkdir();
+            val created = initialDir.mkdir();
             if (created) {
                 log.info("Создан стартовый каталог: {}", initialDir.getAbsolutePath());
             } else {
                 log.error("Не удалось создать стартовый каталог: {}", initialDir.getAbsolutePath());
             }
         }
-
     }
 
     public static void run() {
@@ -39,7 +38,9 @@ public class ConsoleApplication {
                 try {
                     wd.printCurrentDirectory();
                     val input = scan.nextLine().strip();
-                    if (input.isEmpty()) continue;
+                    if (input.isEmpty()) {
+                        continue;
+                    }
 
                     val words = input.split("\\s+");
                     if (words.length > 0) {
@@ -89,7 +90,6 @@ public class ConsoleApplication {
                                 if (targetPath == null && words.length > 1 && !words[1].startsWith("-")) {
                                     targetPath = words[1];
                                 }
-
                                 val treeStatus = wd.drawFileTree(targetPath);
                                 handleStatus(treeStatus);
                                 break;
@@ -121,8 +121,7 @@ public class ConsoleApplication {
                                 } else if (Arrays.asList(words).contains("-d") && words.length >= 3) {
                                     val truncStatus = wd.truncate(words[words.length - 1], true);
                                     handleStatus(truncStatus);
-                                }
-                                else {
+                                } else {
                                     val truncStatus = wd.truncate(words[words.length - 1], false);
                                     handleStatus(truncStatus);
                                 }
@@ -149,16 +148,16 @@ public class ConsoleApplication {
                     log.error("Внештатная ситуация: необработанное исключение во время выполнения команды", e);
                 }
             }
-        } catch (Exception e) {
-            System.out.println("Ошибка инициализации: " + e.getMessage());
-            log.error("Критическая ошибка при инициализации WorkingDirectory", e);
+        } catch (Exception thrown) {
+            System.out.println("Ошибка инициализации: " + thrown.getMessage());
+            log.error("Критическая ошибка при инициализации WorkingDirectory", thrown);
         } finally {
             scan.close();
             log.info("Программа завершила свою работу");
         }
     }
 
-    private static void handleStatus(OperationResult status) {
+    private static void handleStatus(final OperationResult status) {
         if (status.status() == OperationResult.Status.OK) {
             log.info("Штатная ситуация: {}", status.message());
         } else {
