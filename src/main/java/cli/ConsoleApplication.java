@@ -82,7 +82,7 @@ public class ConsoleApplication {
                             case "tree":
                                 String targetPath = null;
                                 for (int i = 1; i < words.length; i++) {
-                                    if (("-o".equals(words[i]) || "--output".equals(words[i])) && i + 1 < words.length) {
+                                    if ("-o".equals(words[i]) && i + 1 < words.length) {
                                         targetPath = words[i + 1];
                                         break;
                                     }
