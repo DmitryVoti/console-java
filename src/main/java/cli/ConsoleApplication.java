@@ -87,9 +87,6 @@ public class ConsoleApplication {
                                         break;
                                     }
                                 }
-                                if (targetPath == null && words.length > 1 && !words[1].startsWith("-")) {
-                                    targetPath = words[1];
-                                }
                                 val treeStatus = wd.drawFileTree(targetPath);
                                 handleStatus(treeStatus);
                                 break;
